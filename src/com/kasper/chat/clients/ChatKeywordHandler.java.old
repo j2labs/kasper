@@ -1,0 +1,164 @@
+package com.kasper.chat.clients;
+
+import java.util.Iterator;
+import java.util.Set;
+
+import com.kasper.core.Log;
+
+public class ChatKeywordHandler {
+
+    private static String KEYWORD_PREFIX = "/";
+	private static enum KEYWORDS {
+        clear, nick, join, leave, chans, nicks, alert,
+        fontsize, fontface, fg, bg, nickcolor,
+        exit, j, l,
+        chanlist, pm, tab, t
+    }
+
+    ChatClient _chatClient = null;
+
+    public ChatKeywordHandler( ChatClient chatClient ) {
+        _chatClient = chatClient;
+    }
+
+    public boolean handleKeyword( String nick, String message, boolean sending ) {
+        
+        // message requires processing after keyword processing
+        boolean additionalProcessing = false;
+
+        String values[] = message.split(" ", 2);
+        boolean hasArgs = (values.length > 1);
+        if( !message.startsWith( KEYWORD_PREFIX ) ) {
+            return true;
+        }
+        
+        String possibleKeyword = values[0];
+        String arguments = null;
+        if( hasArgs ) arguments = values[1];
+
+        if( values.length < 1 ) return false; // empty str
+
+        Log.debug( "Inspect message for keyword: " + possibleKeyword );
+
+
+		if( possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.clear ) ) {
+			_chatClient.clearConvoText();
+            System.gc();
+		}
+        else if( possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.nick ) ) {
+            if( hasArgs ) {
+                String oldNick = _chatClient.getChatConfig().getNick();
+                _chatClient.sendNickChangeRequestMessage( arguments );
+            }
+        }
+        else if( possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.fontsize ) ) {
+            if( hasArgs ) {
+                _chatClient.getChatConfig().setFontSize( new Integer( arguments ) );
+            }
+        }
+        else if( possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.exit ) ) {
+            _chatClient.disconnect();
+        }
+        else if( possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.fontface ) ) {
+            if( hasArgs ) {
+                _chatClient.getChatConfig().setFontFace( arguments );
+            }
+        }
+        else if( possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.fg ) ) {
+            if( hasArgs ) {
+                try {
+                    _chatClient.getChatConfig().setFgColor( arguments );
+                }
+                catch( NumberFormatException nfe ) {
+                    String error = "Foreground color argument is not valid!";
+                    Log.error( error );
+                    _chatClient.displayMessage( _chatClient.getChatConfig().getCurrentChannel(),
+                                                "Display", error );
+                }
+
+            }
+        }
+        else if( possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.bg ) ) {
+            if( hasArgs ) {
+                try {
+                    _chatClient.getChatConfig().setBgColor( arguments );
+                }
+                catch( NumberFormatException nfe ) {
+                    String error = "Background color argument is not valid!";
+                    Log.error( error );
+                    _chatClient.displayMessage( _chatClient.getChatConfig().getCurrentChannel(),
+                                                "Display", error );
+                }
+            }
+        }
+        else if( possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.nickcolor ) ) {
+            if( hasArgs ) {
+                _chatClient.getChatConfig().setNickColor( arguments );
+            }
+        }
+        else if( possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.alert ) ) {
+            additionalProcessing = true;
+            
+            if( hasArgs ) {
+                if( !sending && !nick.equals(  _chatClient.getChatConfig().getNick() )) {
+                    Log.debug( "Triggering alert: " + arguments );
+                    _chatClient.alertUser( arguments );
+                }
+                else if( sending ) {
+                    _chatClient.sendKeywordMessage( arguments );
+                }
+            }
+        }
+        else if( possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.nicks ) ) {
+            _chatClient.sendNickListRequestMessage();
+        }
+        else if( possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.join ) ||
+                 possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.j ) ) {
+            _chatClient.sendJoinChannelMessage( arguments );
+        }
+        else if( possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.leave ) ||
+                 possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.l ) ) {
+            _chatClient.sendLeaveChannelMessage( arguments );
+        }
+        else if( possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.tab )||
+                 possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.t ) ) {
+            if( hasArgs ) {
+                try {
+                    Integer tab = new Integer( arguments );
+                    _chatClient.setCurrentClientPanel( tab.intValue() );
+                } catch (NumberFormatException nfe) {}
+            }
+        }
+        else if( possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.pm ) ) {
+        }
+        else if( possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.chans ) ) {
+            _chatClient.sendChannelListRequestMessage();
+        }
+        else if( possibleKeyword.equals( KEYWORD_PREFIX + KEYWORDS.chanlist ) ) {
+            
+            Set<String> channels = _chatClient.getChatConfig().getActiveChannels();
+            Iterator<String> it = channels.iterator();
+            StringBuffer channelsString = new StringBuffer();
+            int i = 0;
+            if( channels.size() == 0 ) {
+                channelsString.append( "You are not a member of any channels." );
+            }
+            else {
+                while( it.hasNext() ) {
+                    String channel = (String) it.next();
+                    if( i++ > 0 ) { channelsString.append( ", " ); }
+                    channelsString.append( channel );
+                }
+            }
+
+            _chatClient.displayMessage( _chatClient.getChatConfig().getCurrentChannel(),
+                                        "Your channels", channelsString.toString() );
+        }
+        // Not a keyword!
+        else {
+            additionalProcessing = true;
+        }
+
+        return additionalProcessing;
+	}
+}

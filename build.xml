@@ -1,0 +1,65 @@
+<project name="Kasper" default="all" basedir=".">
+
+    <description>Kasper build system</description>
+
+	<property name="src" location="src"/>
+
+	<property name="chat" location="${src}/com/kasper/chat/"/>
+	<property name="core" location="${src}/com/kasper/core/"/>
+	<property name="util" location="${src}/com/kasper/util/"/>
+	<property name="ms" location="${src}/com/kasper/ms/"/>
+	<property name="service" location="${src}/com/kasper/service/"/>
+
+	<property name="build" location="build"/>
+	<property name="build-core" location="${build}"/>
+	<property name="build-chat" location="${build}"/>
+	<property name="build-util" location="${build}"/>
+	<property name="build-ms" location="${build}"/>
+	<property name="build-service" location="${build}"/>
+	<property name="dist"  location="dist"/>
+
+	<target name="init">
+	    <tstamp/>
+		<mkdir dir="${build}"/>
+    </target>
+
+    <target name="all" depends="init,core,util,ms,service,chat" description="compile the whole enchilada">
+    </target>
+
+	<!-- Core build -->
+    <target name="core" description="compile the core of the system">
+		<javac srcdir="${core}" destdir="${build-core}" debug="true" debuglevel="lines,vars,source"/>
+	</target>
+
+	<!-- Server build -->
+    <target name="ms" description="compile the ms package">
+		<javac srcdir="${ms}" destdir="${build-ms}" debug="true" debuglevel="lines,vars,source"/>
+	</target>
+
+	<!-- Chat client build -->
+    <target name="chat" description="compile the jchat package">
+		<javac srcdir="${chat}" destdir="${build-chat}" debug="true" debuglevel="lines,vars,source"/>
+	</target>
+
+	<!-- Service framework build -->
+    <target name="service" description="compile the service framework">
+		<javac srcdir="${service}" destdir="${build-service}" debug="true" debuglevel="lines,vars,source"/>
+	</target>
+
+	<!-- Util interactions build -->
+    <target name="util" description="compile the util packages">
+		<javac srcdir="${util}" destdir="${build-util}" debug="true" debuglevel="lines,vars,source"/>
+	</target>
+
+	<!-- Jars -->
+    <target name="jar" depends="all" description="generate the distribution">
+        <mkdir dir="${dist}"/>
+        <jar jarfile="${dist}/kasper-${DSTAMP}.jar" basedir="${build}"/>
+    </target>
+
+    <target name="clean" description="clean up">
+        <delete dir="${build}"/>
+        <delete dir="${dist}"/>
+    </target>
+
+</project>
