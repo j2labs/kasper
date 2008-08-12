@@ -1,6 +1,6 @@
-package com.kasper.chat.clients.keywords;
+package com.kasper.chat.client.keywords;
 
-import com.kasper.chat.clients.ChatClient;
+import com.kasper.chat.client.ChatClient;
 import com.kasper.core.Log;
 
 public class CKAlert extends ChatKeyword {

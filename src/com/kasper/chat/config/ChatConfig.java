@@ -9,7 +9,7 @@ import java.util.Set;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 
-import com.kasper.chat.clients.ChatClient;
+import com.kasper.chat.client.ChatClient;
 import com.kasper.core.Log;
 import com.kasper.service.ChatServiceConfig;
 

@@ -1,4 +1,4 @@
-package com.kasper.chat.clients;
+package com.kasper.chat.client;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -6,14 +6,14 @@ import java.util.Map;
 import java.util.HashMap;
 
 import com.kasper.core.Log;
-import com.kasper.chat.clients.keywords.CKAlert;
-import com.kasper.chat.clients.keywords.CKChans;
-import com.kasper.chat.clients.keywords.CKClear;
-import com.kasper.chat.clients.keywords.CKJoin;
-import com.kasper.chat.clients.keywords.CKLeave;
-import com.kasper.chat.clients.keywords.CKNick;
-import com.kasper.chat.clients.keywords.CKNicks;
-import com.kasper.chat.clients.keywords.ChatKeyword;
+import com.kasper.chat.client.keywords.CKAlert;
+import com.kasper.chat.client.keywords.CKChans;
+import com.kasper.chat.client.keywords.CKClear;
+import com.kasper.chat.client.keywords.CKJoin;
+import com.kasper.chat.client.keywords.CKLeave;
+import com.kasper.chat.client.keywords.CKNick;
+import com.kasper.chat.client.keywords.CKNicks;
+import com.kasper.chat.client.keywords.ChatKeyword;
 
 
 public class ChatKeywordHandler {

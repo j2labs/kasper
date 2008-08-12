@@ -1,4 +1,4 @@
-package com.kasper.chat.clients;
+package com.kasper.chat.client;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
